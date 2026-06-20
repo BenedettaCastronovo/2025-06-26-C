@@ -31,16 +31,21 @@ class Controller:
             return
 
         self._model.creaGrafo(self._year1, self._year2)
-        nodi = self._model.getNodi()
-        archi = self._model.getArchi()
-        self._view._txt_result.controls.clear()
-        self._view._txt_result.controls.append(ft.Text("grafo creato correttamente"))
+        self._view._txtGraphDetails.controls.clear()
+        self._view._txtGraphDetails.controls.append(ft.Text("grafo creato correttamente"))
         self._view.update_page()
 
 
     def handlePrintDetails(self, e):
-        self._view._txt_result.controls.clear()
-        self._view._txt_result.controls.append(ft.Text(f"nodi: {nodi}, archi: {archi}"))
+        self._view._txtGraphDetails.controls.clear()
+        nodi = self._model.getN()
+        archi = self._model.getA()
+        comp, lista = self._model.ComP()
+        self._view._txtGraphDetails.controls.append(ft.Text(f"nodi: {nodi}, archi: {archi}"))
+        self._view._txtGraphDetails.controls.append(ft.Text(f"comp: {len(comp)}"))
+        self._view._txtGraphDetails.controls.append(ft.Text(f"nodi della comp connessa di dim maggiore:"))
+        for n in lista:
+            self._view._txtGraphDetails.controls.append(ft.Text(f"{n[0].name} - {n[1]} "))
         self._view.update_page()
 
     def handleCercaTeamSfortunati(self, e):
