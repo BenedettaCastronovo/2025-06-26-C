@@ -47,8 +47,7 @@ class DAO():
         piaz = {}
         query = """select ra.`year` as y, r.driverId as id, r.`position` as p
                     from results r, races ra
-                    where r.raceId = ra.raceId and r.constructorId = %s and (ra.`year` between %s and %s)  and r.`position` is not null
-                    group by y, id, p
+                    where r.raceId = ra.raceId and r.constructorId = %s and (ra.`year` between %s and %s)
                     order by r.`position` """
         cursor.execute(query, (c, min, max))
         for row in cursor:
