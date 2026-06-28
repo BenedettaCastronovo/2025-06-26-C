@@ -7,7 +7,7 @@ class Costruttore:
     name: str
     nationality: str
     url: str
-    res: dict = field(default_factory=dict)
+    piaz: dict = field(default_factory=dict)
 
 
     def __eq__(self, other):

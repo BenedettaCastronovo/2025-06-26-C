@@ -49,7 +49,7 @@ class Model:
         self.listaa = sorted(lista, key=lambda x: x[1], reverse=True)
         return self.magg, self.listaa
 
-    def getMaxImp(self, k, m):
+    #def getMaxImp(self, k, m):
         self.best = {}
         self.max = 0
         comp = self.magg
@@ -96,6 +96,67 @@ class Model:
             somma += i
         return somma
 
+    def getMaxImp(self, k, numAnni):
+        #tic = datetime.now()
+        compConnessa = list(nx.connected_components(self._grafo))[0]
+        self._bestScore = 0
+        self._optListConstructors = []
+        parziale = []
+        rimanenti = copy.deepcopy(compConnessa)
+
+        for c in compConnessa:
+            if len(list(c.piaz.keys())) >= numAnni:
+                parziale.append(c)
+                rimanenti.remove(c)
+                self._ricorsione(parziale, rimanenti, k, numAnni)
+                parziale.pop()
+                rimanenti.add(c)
+
+        listOfScores = []
+        for c in self._optListConstructors:
+            listOfScores.append(self._calcolaIndiceConstructor(c))
+
+        #toc = datetime.now()
+        #print(f"Tempo di esecuzione: {toc - tic}")
+        return self._optListConstructors, self._bestScore
+
+    def _ricorsione(self, parziale, rimanenti, soglia, numAnni):
+        if len(parziale) == soglia:
+            # questa fa sia da condizione di ottimalità sia da condizione di terminazione
+            if self._getScoreSoluzione(parziale) > self._bestScore:
+                self._bestScore = self._getScoreSoluzione(parziale)
+                self._optListConstructors = copy.deepcopy(parziale)
+            return
+
+        for c in rimanenti:
+            if len(list(c.piaz.keys())) >= numAnni:
+                parziale.append(c)
+                rimanenti.remove(c)
+                self._ricorsione(parziale, rimanenti, soglia, numAnni)
+                parziale.pop()
+                rimanenti.add(c)
+
+    def _getScoreSoluzione(self, listOfCircuits):
+        listOfScores = []
+        for c in listOfCircuits:
+            listOfScores.append(self._calcolaIndiceConstructor(c))
+
+        return sum(listOfScores)
+
+    def _calcolaIndiceConstructor(self, constructor):
+        nP = 0
+        nPtot = 0
+
+        if len(constructor.piaz.values()) == 0:
+            return 0  # questo caso non dovrebbe mai accadere perchè questa funzione viene chiamata solo su nodi appartenenti alla componente connessa.
+
+        for r in constructor.piaz.values():  # risultati del singolo anno
+            nPtot += len(r)
+            for p in r:  # per ogni anno, prendo i singoli piazzamenti di entrambi i piloti
+                if p.position is not None:
+                    nP += 1
+
+        return 1 - nP / nPtot
 
 
 
